@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class day1 {
+public class day1 {
     static Integer totalDistance = 0;
     static Integer similarityScore = 0;
 
