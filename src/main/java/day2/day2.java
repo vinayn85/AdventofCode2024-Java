@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class day2 {
     static int MAX_LEVEL_DIFFERENCE = 3;
@@ -28,6 +29,7 @@ public class day2 {
             }
 
             System.out.println("Safe Level count: " + day2a(reportList));
+            System.out.println("Safe Level count with Damper: " + day2b(reportList));
 
         } catch (IOException exception) {
             exception.printStackTrace();
@@ -44,8 +46,30 @@ public class day2 {
         return safeLevelCount;
     }
 
+    private static Integer day2b(List<List<Integer>> inputList) {
+        int safeLevelCount = 0;
+        for (List<Integer> currentLevel : inputList) {
+            if (doSafetyCheckWithDamper(currentLevel)) {
+                safeLevelCount++;
+            }
+        }
+        return safeLevelCount;
+    }
+
     private static boolean doSafetyCheck(List<Integer> currentLevel) {
         return (isAllIncreasingLevels(currentLevel) || isAllDecreasingLevels(currentLevel)) && isWithinAcceptableRange(currentLevel);
+    }
+
+    private static boolean doSafetyCheckWithDamper(List<Integer> currentLevel) {
+        for (int index = 0; index < currentLevel.size(); index++) {
+            List<Integer> tmpSplitList1 = currentLevel.subList(0, index);
+            List<Integer> tmpSplitList2 = currentLevel.subList(index + 1, currentLevel.size());
+            List<Integer> tmpDampedList = Stream.concat(tmpSplitList1.stream(), tmpSplitList2.stream()).toList();
+            if (doSafetyCheck(tmpDampedList)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean isAllIncreasingLevels(List<Integer> currentLevel) {
