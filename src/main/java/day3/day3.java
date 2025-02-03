@@ -27,14 +27,12 @@ public class day3 {
         List<String> multiplyExprLines = new ArrayList<>();
         try {
             inputLines = Files.readAllLines(Paths.get("src/main/java/day3/input.txt"));
-
             inputLines.forEach(line -> {
-                if (!line.startsWith("don't")) {
-                    Matcher matcher = mulExprPattern.matcher(line);
-                    while (matcher.find()) {
-                        multiplyExprLines.add(matcher.group());
-                    }
+                Matcher matcher = mulExprPattern.matcher(line);
+                while (matcher.find()) {
+                    multiplyExprLines.add(matcher.group());
                 }
+
             });
 
             System.out.println("Sum of all multiply expressions: " + calculateSumOfMultiplyExpressions(multiplyExprLines));
