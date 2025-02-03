@@ -1,12 +1,11 @@
 package day3;
 
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,49 +14,63 @@ public class day3 {
     static String EXTRACT_MULTIPLICATION_OPERANDS_FROM_MULTIPLY_EXPR = "\\d+";
 
     public static void main(String[] args) {
-        List<String> inputLines = new ArrayList<>();
-        List<String> cleanedInputLines = new ArrayList<>();
+
+        day3a();
+        day3b();
+
+
+    }
+
+    private static void day3a() {
+        List<String> inputLines;
         Pattern mulExprPattern = Pattern.compile(EXTRACT_MULTIPLY_EXPR_REGEX);
-        List<String> multiplyExprRegexMatches = new ArrayList<>();
+        List<String> multiplyExprLines = new ArrayList<>();
+        try {
+            inputLines = Files.readAllLines(Paths.get("src/main/java/day3/input.txt"));
+
+            inputLines.forEach(line -> {
+                if (!line.startsWith("don't")) {
+                    Matcher matcher = mulExprPattern.matcher(line);
+                    while (matcher.find()) {
+                        multiplyExprLines.add(matcher.group());
+                    }
+                }
+            });
+
+            System.out.println("Sum of all multiply expressions: " + calculateSumOfMultiplyExpressions(multiplyExprLines));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    private static void day3b() {
+        String inputLines;
+        Pattern mulExprPattern = Pattern.compile(EXTRACT_MULTIPLY_EXPR_REGEX);
         List<String> enabledMultipleExprRegexMatches = new ArrayList<>();
-        List<String> enabledMultipleExpressions= new ArrayList<>();
-        List<String> splitInputLines = new ArrayList<>();
+        try {
+            //Day3b Approach
+            inputLines = Files.readString(Paths.get("./src/main/java/day3/input.txt")); // Reading as single string to mimic Rust approach. Reading lines seems to leave a chunk of don't expressions
+            inputLines = inputLines.replaceAll("\\n", " ");
+            inputLines = inputLines.replaceAll("don't\\(\\)", "\ndon't()");
+            inputLines = inputLines.replaceAll("do\\(\\)", "\ndo()");
 
-        try (BufferedReader inputFileReader = Files.newBufferedReader(Paths.get("./src/main/java/day3/input.txt"))) {
-            inputFileReader.lines().forEach(inputLines::add);
+            List<String> splitInputLines = new ArrayList<>(Arrays.stream(inputLines.split("\\n")).toList());
 
-            inputLines.forEach(line->{
-                line = line.trim();
-                line = line.replaceAll("\\s+", "");
-                line = line.replace("\n","");
-                line = line.replace("\r","");
-                line = line.replace("don't()","\ndon't()");
-                line = line.replace("do()","\ndo()");
-                cleanedInputLines.add(line);
-            });
-
-            for (String line : cleanedInputLines) {
-                String[] tmpSplit = line.split("\n");
-                splitInputLines.addAll(Arrays.stream(tmpSplit).toList());
-            }
-
-            splitInputLines.forEach(line->{
-                if(!line.startsWith("don't")){
-                    enabledMultipleExpressions.add(line);
+            splitInputLines.forEach(line -> {
+                if (!line.startsWith("don't")) {
+                    Matcher matcher = mulExprPattern.matcher(line);
+                    while (matcher.find()) {
+                        enabledMultipleExprRegexMatches.add(matcher.group());
+                    }
                 }
             });
 
-            for (String line : enabledMultipleExpressions) {
-                Matcher matcher = mulExprPattern.matcher(line);
-                while (matcher.find()) {
-                    enabledMultipleExprRegexMatches.add(matcher.group());
-                }
-            }
+            System.out.println("Sum of enabled multiply expressions: " + calculateSumOfMultiplyExpressions(enabledMultipleExprRegexMatches));
 
-            System.out.println(calculateSumOfMultiplyExpressions(enabledMultipleExprRegexMatches));
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
     }
 
